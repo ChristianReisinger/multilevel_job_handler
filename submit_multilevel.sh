@@ -7,8 +7,7 @@ NODE_MEM=192000
 
 ##############################################
 
-
-if [ $# -lt 14 ]; then
+function print_help {
 	echo "Usage: $0 <logfile_prefix> <conf_prefix> <first_conf> <beta> <T> <L> <configs>"
 	echo -e "\t<mem> <time> <comp_file> <WL_Rs> <NAPEs> <updates> <seed>"
 	echo -e "\t[<nodes_per_step> [<partition> [<array>]]]"
@@ -21,6 +20,16 @@ if [ $# -lt 14 ]; then
 	echo -e "\t<configs>: comma separated list of the number of configs at levels 0,1,..."
 	echo -e "\t<updates>: comma separated list of the number of updates at levels 0,1,..."
 	exit
+}
+
+for arg in "$@"; do
+	if [ $arg == '-h' ] || [ $arg == '--help' ]; then
+		print_help
+	fi
+done
+
+if [ $# -lt 14 ]; then
+	print_help
 fi
 
 logfile_prefix="${1}"
