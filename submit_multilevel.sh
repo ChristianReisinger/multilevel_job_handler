@@ -10,7 +10,7 @@ NODE_MEM=192000
 function print_help {
 	echo "Usage: $0 <logfile_prefix> <conf_prefix> <first_conf> <beta> <T> <L> <configs>"
 	echo -e "\t<mem> <time> <comp_file> <WL_Rs> <NAPEs> <updates> <seed>"
-	echo -e "\t[<conf_id_incr> [<nodes_per_step> [<partition> [<array>]]]]"
+	echo -e "\t[<confs_per_task> [<conf_id_incr> [<nodes_per_step> [<partition> [<array>]]]]]"
 	echo ""
 	echo -e "\tSubmit multilevel jobs. Automatically request as many job steps"
 	echo -e "\tas needed for the given <mem>, with <nodes_per_step> (default=2)"
@@ -47,21 +47,24 @@ WL_Rs=${11}
 NAPEs=${12}
 updates=${13}
 seed=${14}
-conf_id_incr=${15:-0}
-nodes_per_step=${16:-2}
-partition=${17:-"general1"}
+confs_per_task=${15}
+conf_id_incr=${16:-0}
+nodes_per_step=${17:-2}
+partition=${18:-"general1"}
 
 top_level_confs=${configs%%,*}
 level_confs=${configs#*,}
 
+task_num=$(((${top_level_confs}+${confs_per_task}-1)/${confs_per_task})) #ceil(top_level_confs/confs_per_task)
+
 max_tasks_per_node=$((${NODE_MEM}/${mem}))
 tasks_per_node=$((${max_tasks_per_node}<${NODE_CPUS}?${max_tasks_per_node}:${NODE_CPUS}))
-nodes=$(((${top_level_confs}+${tasks_per_node}-1)/${tasks_per_node})) #ceil(top_level_confs/tasks_per_node)
+nodes=$(((${task_num}+${tasks_per_node}-1)/${tasks_per_node})) #ceil(task_num/tasks_per_node)
 steps=$(((${nodes}+${nodes_per_step}-1)/${nodes_per_step})) #ceil(nodes/nodes_per_step)
 
 tasks_per_step=$((${nodes_per_step}*${tasks_per_node}))
 
-array=${18:-"0-$(($steps-1))"}
+array=${19:-"0-$(($steps-1))"}
 
 cpus_per_task=$((${NODE_CPUS}/${tasks_per_node}))
 mem_per_cpu=$(($mem/$cpus_per_task))
@@ -78,4 +81,4 @@ echo -e "\tCPUs per task:\t$cpus_per_task"
 jobscript="/home/mesonqcd/reisinger/programs/scripts/multilevel/run_multilevel_job.sh"
 
 exclude="-x node45-001"
-sbatch $exclude --partition=$partition -J"${logfile_prefix}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task $conf_id_incr
+sbatch $exclude --partition=$partition -J"${logfile_prefix}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task $confs_per_task $conf_id_incr
