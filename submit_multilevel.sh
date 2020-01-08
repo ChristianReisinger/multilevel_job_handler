@@ -62,17 +62,18 @@ tasks_per_step=$((${nodes_per_step}*${tasks_per_node}))
 array=${17:-"0-$(($steps-1))"}
 
 cpus_per_task=$((${NODE_CPUS}/${tasks_per_node}))
+mem_per_cpu=$(($mem/$cpus_per_task))
 
 echo "Submitting job ..."
 echo -e "\t--partition=$partition"
 echo -e "\t--nodes=$nodes_per_step"
 echo -e "\t--ntasks-per-node=$tasks_per_node"
-echo -e "\t--mem-per-cpu=$mem"
+echo -e "\t--mem-per-cpu=$mem_per_cpu"
 echo -e "\t--time=$jobtime"
-echo -e "\t--array=$array"
+echo -e "\t--steps=$steps"
 echo -e "\tCPUs per task:\t$cpus_per_task"
 
 jobscript="/home/mesonqcd/reisinger/programs/scripts/multilevel/run_multilevel_job.sh"
 
-#exclude="-x node45-021,node50-[021,024],node49-[032-033]"
-sbatch --partition=$partition -J"${logfile_prefix}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task
+exclude="-x node45-001"
+sbatch $exclude --partition=$partition -J"${logfile_prefix}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task
