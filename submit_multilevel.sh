@@ -53,7 +53,7 @@ top_level_confs=${configs%%,*}
 level_confs=${configs#*,}
 
 max_tasks_per_node=$((${NODE_MEM}/${mem}))
-tasks_per_node=$((${max_tasks_per_node=}<${NODE_CPUS}?${max_tasks_per_node=}:${NODE_CPUS}))
+tasks_per_node=$((${max_tasks_per_node}<${NODE_CPUS}?${max_tasks_per_node}:${NODE_CPUS}))
 nodes=$(((${top_level_confs}+${tasks_per_node}-1)/${tasks_per_node})) #ceil(top_level_confs/tasks_per_node)
 steps=$(((${nodes}+${nodes_per_step}-1)/${nodes_per_step})) #ceil(nodes/nodes_per_step)
 
