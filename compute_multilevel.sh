@@ -2,7 +2,7 @@
 
 err="Usage: $0 <logfile_prefix> <conf_prefix> <beta> <T> <L> <configs> <comp_file> <WL_Rs> <NAPEs> <updates> <seed> <step_firstconf> <confs_per_task> <conf_id_incr>"
 
-if [ $# -ne 12 ]; then
+if [ $# -ne 14 ]; then
 	echo $err
 	exit
 fi
