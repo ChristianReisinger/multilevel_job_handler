@@ -29,5 +29,6 @@ tag="${logfile_prefix}_c${configs}_up${updates}_s${seed}"
 program="/home/mesonqcd/reisinger/programs/multilevel/bin/multilevel"
 
 for conf in $(seq $task_firstconf $task_lastconf); do
-	"$program" -e $(($conf+$conf_id_incr)) -b $beta -s $((${seed}+${conf})) -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix 1 >& ${tag}.${conf}.log
+	conf_shifted=$(($conf+$conf_id_incr))
+	"$program" -e ${conf_shifted} -b $beta -s $((${seed}+${conf})) -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix 1 >& ${tag}.${conf_shifted}.log
 done

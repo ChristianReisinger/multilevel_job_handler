@@ -9,8 +9,8 @@ NODE_MEM=192000
 
 function print_help {
 	echo "Usage: $0 <logfile_prefix> <conf_prefix> <first_conf> <beta> <T> <L> <configs>"
-	echo -e "\t<mem> <time> <comp_file> <WL_Rs> <NAPEs> <updates> <seed>"
-	echo -e "\t[<confs_per_task> [<conf_id_incr> [<nodes_per_step> [<partition> [<array>]]]]]"
+	echo -e "\t<mem> <time> <comp_file> <WL_Rs> <NAPEs> <updates> <seed> <confs_per_task>"
+	echo -e "\t[<conf_id_incr> [<nodes_per_step> [<partition> [<array>]]]]"
 	echo ""
 	echo -e "\tSubmit multilevel jobs. Automatically request as many job steps"
 	echo -e "\tas needed for the given <mem>, with <nodes_per_step> (default=2)"
@@ -29,7 +29,7 @@ for arg in "$@"; do
 	fi
 done
 
-if [ $# -lt 14 ]; then
+if [ $# -lt 15 ]; then
 	print_help
 fi
 
@@ -81,4 +81,4 @@ echo -e "\tCPUs per task:\t$cpus_per_task"
 jobscript="/home/mesonqcd/reisinger/programs/scripts/multilevel/run_multilevel_job.sh"
 
 exclude="-x node45-001"
-sbatch $exclude --partition=$partition -J"${logfile_prefix}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task $confs_per_task $conf_id_incr
+sbatch $exclude --partition=$partition -J"${logfile_prefix}_T${T}L${L}_b${beta}_N${NAPEs}_c${configs}_up${updates}_s${seed}.$first_conf" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $first_conf $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $tasks_per_step $cpus_per_task $confs_per_task $conf_id_incr
