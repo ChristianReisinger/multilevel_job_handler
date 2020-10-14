@@ -1,6 +1,6 @@
 #!/bin/bash
 
-err="Usage: $0 <logfile_prefix> <conf_file> <beta> <T> <L> <configs> <comp_file> <WL_Rs> <NAPEs> <updates> <seed> <step_firstconf> <confs_per_task> <conf_id_incr>"
+err="Usage: $0 <logfile_prefix> <conf_prefix> <beta> <T> <L> <configs> <comp_file> <WL_Rs> <NAPEs> <updates> <seed> <step_firstconf> <confs_per_task> <conf_id_incr>"
 
 if [ $# -ne 14 ]; then
 	echo $err
@@ -8,7 +8,7 @@ if [ $# -ne 14 ]; then
 fi
 
 logfile_prefix="${1}"
-conf_file="${2}"
+conf_prefix="${2}"
 beta="${3}"
 T="${4}"
 L="${5}"
@@ -28,9 +28,7 @@ tag="${logfile_prefix}_c${configs}_up${updates}_s${seed}"
 
 program="/home/mesonqcd/reisinger/programs/multilevel/bin/multilevel"
 
-conf_prefix=${conf_file%.*}
-conf_id=${conf_file##*.}
 for conf in $(seq $task_firstconf $task_lastconf); do
 	conf_shifted=$(($conf+$conf_id_incr))
-	"$program" -e ${conf_shifted} -b $beta -s $((${seed}+${conf_shifted})) -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix $conf_id >& ${tag}.${conf_shifted}.log
+	"$program" -e ${conf_shifted} -b $beta -s ${seed} -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix $conf >& ${tag}.${conf_shifted}.log
 done
