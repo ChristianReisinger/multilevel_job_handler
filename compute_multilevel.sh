@@ -30,5 +30,5 @@ program="/home/mesonqcd/reisinger/programs/multilevel/bin/multilevel"
 
 for conf in $(seq $task_firstconf $task_lastconf); do
 	conf_shifted=$(($conf+$conf_id_incr))
-	"$program" -e ${conf_shifted} -b $beta -s ${seed} -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix $conf >& ${tag}.${conf_shifted}.log
+	"$program" -e ${conf_shifted} -b $beta -s $((${seed}+${conf_shifted})) -u $updates $T $L $WL_Rs $NAPEs 1,$configs $comp_file $conf_prefix $conf >& ${tag}.${conf_shifted}.log
 done
