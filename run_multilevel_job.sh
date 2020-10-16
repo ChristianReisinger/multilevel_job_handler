@@ -31,6 +31,6 @@ conf_id_incr=${16}
 export OMP_NUM_THREADS=$cpus_per_task
 
 taskscript="/home/mesonqcd/reisinger/programs/scripts/multilevel/compute_multilevel.sh"
-step_firstconf=$((${first_conf_id}+${confs_per_task}*${tasks_per_step}*${SLURM_ARRAY_TASK_ID}+1))
+step_firstconf=$((${first_conf_id}+${confs_per_task}*${tasks_per_step}*${SLURM_ARRAY_TASK_ID}))
 
 srun -n${tasks_per_step} --cpus-per-task=$cpus_per_task "$taskscript" "$logfile_prefix" "$conf_prefix" $beta $T $L $configs "$comp_file" $WL_Rs $NAPEs $updates $seed $step_firstconf $confs_per_task $conf_id_incr
