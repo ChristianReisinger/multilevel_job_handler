@@ -6,7 +6,7 @@ module load comp/gcc/8.2.0
 
 err="Usage: $0 <logfile_prefix> <conf_prefix> <beta> <T> <L> <configs> <comp_file> <WL_Rs> <NAPEs> <updates> <seed> <first_conf_id> <tasks_per_step> <cpus_per_task> <confs_per_task> <conf_id_incr>"
 
-if [ $# -ne 15 ]; then
+if [ $# -ne 16 ]; then
 	echo $err
 	exit
 fi

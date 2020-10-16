@@ -24,12 +24,12 @@ function print_help {
 }
 
 for arg in "$@"; do
-	if [ $arg == '-h' ] || [ $arg == '--help' ]; then
+	if [ "$arg" == '-h' ] || [ "$arg" == '--help' ]; then
 		print_help
 	fi
 done
 
-if [ $# -lt 14 ]; then
+if [ $# -lt 15 ]; then
 	print_help
 fi
 
