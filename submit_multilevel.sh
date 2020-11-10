@@ -81,7 +81,7 @@ echo -e "\t--steps=$steps"
 echo -e "\tCPUs per task:\t$cpus_per_task"
 
 args=( "$@" )
-for i in {1..15}; do echo "${args[$i]}" >> job_info; done
+for i in {0..14}; do echo "${args[$i]}" >> job_info; done
 echo "$conf_id_incr" >> job_info
 echo "$nodes_per_step" >> job_info
 echo "$partition" >> job_info
@@ -91,5 +91,5 @@ echo "first_out_id=$(($first_conf_id+$conf_id_incr))" >> job_info
 
 jobscript="/home/mesonqcd/reisinger/programs/scripts/multilevel/run_multilevel_job.sh"
 
-exclude="-x node53-021,node47-[024-025],node48-020"
+#exclude="-x node53-021,node47-[024-025],node48-020"
 sbatch $exclude --partition=$partition -J"${logfile_prefix}_T${T}L${L}_b${beta}_N${NAPEs}_c${configs}_up${updates}_s${seed}" --nodes=$nodes_per_step --ntasks-per-node=$tasks_per_node --mem-per-cpu=$mem_per_cpu --time=$jobtime --array=$array "$jobscript" "$logfile_prefix" "$conf_prefix" $beta $T $L $level_confs $comp_file $WL_Rs $NAPEs $updates $seed $first_conf_id $tasks_per_step $cpus_per_task $confs_per_task $conf_id_incr

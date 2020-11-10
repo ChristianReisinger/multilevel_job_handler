@@ -21,14 +21,15 @@ while read -r line; do
 	cmnd_args+=( "$line" )
 done < job_info
 
+failed_steps=""
 for f in slurm*; do
 
 	[[ -s "$f" ]] || continue
 
 	jobid=$(echo "$f" | grep -oE 'slurm-[0-9]+_' | grep -oE '[0-9]+')
-	step=$(echo "$f" | grep -oE '_[0-9]+.out' | greo -oE '[0-9]+')
+	step=$(echo "$f" | grep -oE '_[0-9]+.out' | grep -oE '[0-9]+')
 
-	if ! [[ "$jobid" =~ ^[0-9]+$ ]] || ! [[ "$step" =~ ^[0-9]+$]]; then
+	if ! [[ "$jobid" =~ ^[0-9]+$ ]] || ! [[ "$step" =~ ^[0-9]+$ ]]; then
 		continue
 	fi
 
@@ -47,14 +48,31 @@ for f in slurm*; do
 		rm -f *.$c *.${c}.log
 	done
 
-	read -p "Resubmitting job... submit (y) with failed nodes excluded (x): "
-	if [[ "$ans" == "x" ]]; then
-		excl="$(sacct -j "${jobid}_${step}" -no "nodelist%150" | head -1 | awk '{print $1}')"
-		sed -i -r 's/^#?exclude=.*/exclude="-x '${excl}'"/' "$submit_scr"
-	elif [[ "$ans" == "y" ]]; then
-		sed -i -r 's/^exclude=/#exclude=/' "$submit_scr"
-	else
-		continue
-	fi
-	"$submit_scr" "${cmnd_args[@]}" $step
+	[[ "${#failed_steps}" -eq 0 ]] || failed_steps="${failed_steps},"
+	failed_steps="${failed_steps}$step"
+
 done
+
+submit=true
+
+failed_num=$(echo "$failed_steps" | tr ',' '\n' | wc -l)
+failed_num_uniq=$(echo "$failed_steps" | tr ',' '\n' | sort | uniq | wc -l)
+if [[ $failed_num -ne $failed_num_uniq ]]; then
+	submit=false
+	echo "Duplicate failed step(s) found ... manually resubmit:"
+fi
+
+read -p "Resubmitting job... submit (y) with failed nodes excluded (x): "
+if [[ "$ans" == "x" ]]; then
+	excl="$(sacct -j "${jobid}_${step}" -no "nodelist%150" | head -1 | awk '{print $1}')"
+	sed -i -r 's/^#?exclude=.*/exclude="-x '${excl}'"/' "$submit_scr"
+elif [[ "$ans" == "y" ]]; then
+	sed -i -r 's/^exclude=/#exclude=/' "$submit_scr"
+else
+	submit=false
+	echo "Skipping submit .. manually run:"
+fi
+
+echo "$submit_scr" "${cmnd_args[@]}" $failed_steps
+$submit && "$submit_scr" "${cmnd_args[@]}" $failed_steps
+
